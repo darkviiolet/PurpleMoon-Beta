@@ -29,21 +29,24 @@ enemyY = random.randint(10, 150)
 enemyX_update = 0.2
 enemyY_update = 20
 
-# enemy 2
-enemyA = random.randint(0, 736)
-enemyB = random.randint(10, 150)
-enemyA_update = 0.2
-enemyB_update = 20
-
+bulletImg = pygame.image.load("butterfly.png")
+bulletX = 0
+bulletY = 500
+bulletX_update = 0
+bulletY_update = 1
+bullet_state = "ready"
 
 # Game code
 def player(x, y):
     screen.blit(playerImg, (x, y))  # means draw player
 
-
 def enemy(x, y):
     screen.blit(enemyImg, (x, y))  # means draw enemy
 
+def fire_bullet(x, y):
+    global bullet_state
+    bullet_state = "fire"
+    screen.blit(bulletImg, (x + 16, y + 10))
 
 # Game loop
 running = True
@@ -61,6 +64,9 @@ while running:
                 playerX_update = -0.5
             if event.key == pygame.K_RIGHT:
                 playerX_update = 0.5
+            if event.key == pygame.K_SPACE:
+                bulletX = playerX
+                fire_bullet(playerX, bulletY)
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                 playerX_update = 0
@@ -81,16 +87,16 @@ while running:
         enemyX_update = -0.2
         enemyY += enemyY_update
 
-# second enemy movement control
-    enemyA += enemyA_update
-    if enemyA <= 0:
-        enemyA_update = 0.2
-        enemyB += enemyB_update
-    elif enemyA >= 736:
-        enemyA_update = -0.2
-        enemyB += enemyB_update
+    # bullet movement
+    if bulletY <= 0:
+        bulletY = 500
+        bullet_state = "ready"
+
+    # bullet firing
+    if bullet_state is "fire":
+        fire_bullet(bulletX, bulletY)
+        bulletY -= bulletY_update
 
     player(playerX, playerY)
     enemy(enemyX, enemyY)
-    enemy(enemyA, enemyB)
     pygame.display.update()
